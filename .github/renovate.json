@@ -13,13 +13,16 @@
     "poetry",
     "bazelisk",
     "bazel-module",
-    "github-actions"
+    "github-actions",
+    "custom.regex"
   ],
   "includePaths": [
     "drake_pip/**",
     "drake_poetry/**",
     "drake_bazel_download/**",
     "drake_bazel_external/**",
+    "drake_cmake_installed/**",
+    "drake_cmake_installed_apt/**",
     "**/.github/**"
   ],
   "packageRules": [
@@ -32,6 +35,21 @@
         "github-actions"
       ],
       "rangeStrategy": "bump"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "**/CMakeLists.txt",
+        "**/*.cmake"
+      ],
+      "matchStrings": [
+        "(?<indentation>[ \\t]*)#\\s*renovate: (?<depName>[^\\s]+) (?<currentVersion>[^\\s]+)\\s*URL (?<registryUrl>https?:\\/\\/[^\\/\\s]+)\\/(?<packageName>[^\\/\\s]+\\/[^\\/\\s]+)\\/archive\\/(?<currentDigest>[a-f0-9]{40})\\.tar\\.gz\\s*URL_HASH SHA256=(?<urlHash>[A-Fa-f0-9]{64})"
+      ],
+      "datasourceTemplate": "github-releases",
+      "currentValueTemplate": "{{{currentVersion}}} {{{currentDigest}}}",
+      "autoReplaceStringTemplate": "{{{indentation}}}# renovate: {{{depName}}} {{{nweVersion}}}\n{{{indentation}}}URL {{{sourceUrl}}}/archive/{{{newDigest}}}.tar.gz URL_HASH SHA256=>>{{{depName}}}-newsha<<"
     }
   ]
 }
